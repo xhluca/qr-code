@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="application-name" content="QR Code Generator">
+
+    <title>QR Code Generator</title>
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" href="icons/favicon.ico" type="image/x-icon">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+    
+    <script src="js/qrcode.min.js"></script>
+    
+    <style>
+        #qrcode {
+            margin-top: 15px;
+        }
+        #qrcode > img {
+            max-width: 100%;
+            max-height: 80%;
+        }
+        #qrcode > canvas {
+            max-width: 100%;
+            max-height: 80%;
+        }
+
+        .container {
+            padding-top: 20px;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #f8f9fa;
+            padding: 1em;
+        }
+        .footer > p {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="text-center">QR Code Generator</h1>
+        <div class="input-group mb-3">
+            <input id="text" type="text" class="form-control" placeholder="Enter URL here"
+                aria-label="URL for creating QR code" aria-describedby="basic-addon2" onkeypress=generateQRCodePress()>
+            <div class="input-group-append">
+                <button class="btn btn-outline-primary" type="button" onclick="generateQRCode()">Generate</button>
+            </div>
+        </div>
+        <div id="qrcode" class="d-flex justify-content-center"></div>
+        <br>
+        <h5 id="urlText" class="text-center"></h5>
+        <br>
+        <div class="d-flex justify-content-center" style="margin-bottom: 50px;">
+            <button id="downloadButton" class="btn btn-outline-primary btn-lg" type="button" onclick="downloadQRCode()"
+                style="display: none;">Download ⬇️</button>
+        </div>
+        <br>
+    </div>
+    <script>
+        function generateQRCode() {
+            const text = document.getElementById('text').value;
+            const qrElem = document.getElementById('qrcode');
+            qrElem.innerHTML = ""; // Clear previous QR Code
+            new QRCode(qrElem, {
+                text: text,
+                width: 512,
+                height: 512
+            });
+            document.getElementById('urlText').innerText = text; // Display URL below QR Code
+            document.getElementById('downloadButton').style.display = 'block'; // Show download button
+        }
+        function generateQRCodePress() {
+            if (event.key === 'Enter') {
+                generateQRCode();
+            }
+        }
+    </script>
+    <script>
+        function downloadQRCode() {
+            const canvas = document.getElementById('qrcode').querySelector('canvas');
+            const url = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+            const link = document.createElement('a');
+            link.download = 'qrcode.png';
+            link.href = url;
+            link.click();
+        }
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                const swName = 'service-worker.js';
+                const swPath = new URL(swName, window.location).pathname;
+                navigator.serviceWorker.register(swPath).then((registration) => {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, (err) => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+    </script>
+</body>
+
+<footer>
+    <div class="footer">
+        <p class="text-center">
+            Built with <a href="https://davidshimjs.github.io/qrcodejs/" target="_blank">qrcode.js</a>
+            and <a href="https://getbootstrap.com/" target="_blank">Bootstrap</a>
+        </p>
+    </div>
+</footer>
+
+</html>
